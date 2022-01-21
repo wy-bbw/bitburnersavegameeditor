@@ -16,19 +16,25 @@ find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 # Add source to this project's executable.
 
-set(SOURCEFILES "src/gui/MainWindow.cpp" "src/main.cpp")
+set(SOURCEFILES 
+"src/main.cpp" 
+"src/gui/MainWindow.cpp" 
+"src/core/SavefileManager.cpp"  
+"src/core/ContentRepository.cpp" 
+ "src/core/base64.cpp")
+
 set(UIFILES "src/gui/MainWindow.ui")
-add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES} )
+add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES}  "include/core/base64.h" "src/core/base64.cpp")
 
 target_include_directories(BitburnerEditor
     PUBLIC
-        Main/include
+    "include/"
     $<$<CONFIG:DEBUG>:${CMAKE_CURRENT_BINARY_DIR}>
     $<$<CONFIG:RELEASE>:${CMAKE_CURRENT_BINARY_DIR}>
 )
 
 
 target_link_libraries(BitburnerEditor Qt6::Widgets)
-#find_program(windpl NAMES windeployqt)
-#message("windeployqt: ${windpl}")
 
+enable_testing()
+add_subdirectory("test/")
