@@ -4,24 +4,24 @@
 #include <string>
 #include <QVariant>
 
-using Data = QVariant
-;
+using Data = QVariant;
 
 
 class Node {
 public:
-	explicit Node(const std::vector<Data>& data, Node* parent = nullptr);
+	explicit Node(const std::vector<QVariant>& name, Node* parent = nullptr);
 	~Node();
 
 	void appendChild(Node* child);
 	Node* child(unsigned int row);
 	Node* parentItem();
 	Data data(unsigned int column) const;
+	void pushData(Data data);
 	unsigned int childCount() const;
 	unsigned int columnCount() const;
 	unsigned int row() const;
 private:
 	std::vector<Node*> children;
-	std::vector<Data> itemData;
+	std::vector<QVariant> itemData;
 	Node* parent;
 };

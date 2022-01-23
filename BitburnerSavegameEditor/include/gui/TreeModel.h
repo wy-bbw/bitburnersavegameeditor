@@ -1,11 +1,11 @@
 #pragma once
 #include <QAbstractItemModel>
-#include <core/Node.h>
+#include <core/json/Node.h>
 
 class TreeModel : public QAbstractItemModel {
 	Q_OBJECT
 public:
-	explicit TreeModel(const QString& data, QObject* parent = nullptr);
+	explicit TreeModel(QObject* parent = nullptr);
 
 	QVariant data(const QModelIndex& index, int role) const override;
 	Qt::ItemFlags flags(const QModelIndex& index) const override;

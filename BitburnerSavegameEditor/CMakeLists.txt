@@ -17,25 +17,24 @@ find_package(Qt6 COMPONENTS Widgets REQUIRED)
 # Add source to this project's executable.
 
 set(SOURCEFILES 
+"include/gui/TreeModel.h"
+"src/gui/TreeModel.cpp"
 "src/main.cpp" 
 "src/gui/MainWindow.cpp"
 "src/gui/Raw.cpp"
 "src/core/SavefileManager.cpp"  
-"src/core/ContentRepository.cpp" 
-
 "src/core/base64.cpp"
-"src/core/Node.cpp"
-"src/gui/TreeModel.cpp"
-)
+"src/core/json/Node.cpp"
+"src/core/json/JsonParser.cpp")
 
-set(UIFILES "src/gui/MainWindow.ui" "src/gui/Raw.ui")
+set(UIFILES 
+"src/gui/MainWindow.ui" "src/gui/Raw.ui")
+
 add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES})
 
 target_include_directories(BitburnerEditor
     PUBLIC
     "include/"
-    $<$<CONFIG:DEBUG>:${CMAKE_CURRENT_BINARY_DIR}/BitburnerEditor_autogen/include>
-    $<$<CONFIG:RELEASE>:${CMAKE_CURRENT_BINARY_DIR}/BitburnerEditor_autogen/include>
 )
 
 target_link_libraries(BitburnerEditor Qt6::Widgets)

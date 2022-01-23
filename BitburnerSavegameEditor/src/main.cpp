@@ -1,5 +1,5 @@
 #include <QtWidgets/QApplication>
-
+#include <core/json/Node.h>
 #include "gui/MainWindow.h"
 
 int main(int argc, char *argv[]) {

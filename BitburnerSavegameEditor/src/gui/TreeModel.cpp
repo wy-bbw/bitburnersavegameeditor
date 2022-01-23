@@ -1,6 +1,6 @@
 #include <gui/TreeModel.h>
 
-TreeModel::TreeModel(const QString& data, QObject* parent) : QAbstractItemModel(parent) {
+TreeModel::TreeModel(QObject* parent) : QAbstractItemModel(parent) {
 	rootNode = nullptr;
 }
 
@@ -67,11 +67,17 @@ QVariant TreeModel::data(const QModelIndex& index, int role) const {
 		return QVariant();
 	}
 
-	if (role != Qt::DisplayPropertyRole) {
+	if (role == Qt::DisplayRole) {
+
+	}
+
+	if (role != Qt::DisplayPropertyRole && role != Qt::DisplayRole) {
 		return QVariant();
 	}
 
 	Node* item = static_cast<Node*>(index.internalPointer());
+	QVariant data = item->data(index.column());
+	QString stringname = data.toString();
 	return item->data(index.column());
 }
 
@@ -84,7 +90,7 @@ Qt::ItemFlags TreeModel::flags(const QModelIndex& index) const {
 
 QVariant TreeModel::headerData(int section, Qt::Orientation orientation, int role) const {
 	if (orientation == Qt::Horizontal && role == Qt::DisplayRole) {
-		return "foo";
+		return rootNode->data(section);
 	}
 	return QVariant();
 }

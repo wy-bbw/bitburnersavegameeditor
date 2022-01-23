@@ -1,6 +1,6 @@
-#include <core/Node.h>
+#include <core/json/Node.h>
 
-Node::Node(const std::vector<Data>& data, Node* parent) : itemData(data), parent(parent) {}
+Node::Node(const std::vector<QVariant>& data, Node* parent) : itemData(data), parent(parent) {}
 
 Node::~Node() {
 	for (auto p : children) delete p;
@@ -31,16 +31,20 @@ unsigned int Node::row() const {
 }
 
 unsigned int Node::columnCount() const {
-	return itemData.size();
+	return 1;
 }
 
 Data Node::data(unsigned int column) const {
 	if (column >= itemData.size()) {
 		return Data();
 	}
-	return itemData[column];
+	return QVariant(itemData[column]);
 }
 
 Node* Node::parentItem() {
 	return parent;
+}
+
+void Node::pushData(QVariant data) {
+	itemData.push_back(data);
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "ui.MainWindow.h"
 #include <QMainWindow>
 #include <core/SavefileManager.h>
 #include "ui_mainWindow.h"
@@ -18,7 +17,7 @@ private:
 	void openButtonPressed();
 	void saveButtonPressed();
 	
-	void setupRawView();
+	void setupRawView(const std::vector<std::byte>& fileData);
 signals:
 	void contentChanged();
 };
