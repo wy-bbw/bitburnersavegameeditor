@@ -6,9 +6,14 @@
 #include <list>
 #include <core/ContentRepository.h>
 
+#include <core/Node.h>
+
+#include "Raw.h"
+
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
 	ui.setupUi(this);
 	initializeButtons();
+	ui.tabWidget->clear();
 }
 
 void MainWindow::initializeButtons() {
@@ -17,7 +22,6 @@ void MainWindow::initializeButtons() {
 
 	ui.actionsave->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	connect(ui.actionsave, &QAction::triggered, this, &MainWindow::saveButtonPressed);
-
 }
 
 void MainWindow::openButtonPressed() {
@@ -26,12 +30,20 @@ void MainWindow::openButtonPressed() {
 		return;
 	}
 	savefileManager.load(filename.toStdString());
-	ContentRepository c;
-	c.addContent(savefileManager.getData());
+	
+	setupRawView();
 	emit contentChanged();
 }
 
 void MainWindow::saveButtonPressed() {
 	std::vector<std::byte> f{ std::byte{1}, std::byte{2}, std::byte{3} };
 	savefileManager.store("foo");
+}
+
+void MainWindow::setupRawView() {
+	Raw* raw = new Raw(this);
+
+	Node* node = new Node();
+	ui.tabWidget->clear();
+	ui.tabWidget->addTab(raw, tr("raw"));
 }

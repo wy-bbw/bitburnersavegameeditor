@@ -17,6 +17,8 @@ private:
 
 	void openButtonPressed();
 	void saveButtonPressed();
+	
+	void setupRawView();
 signals:
 	void contentChanged();
 };

@@ -18,21 +18,25 @@ find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
 set(SOURCEFILES 
 "src/main.cpp" 
-"src/gui/MainWindow.cpp" 
+"src/gui/MainWindow.cpp"
+"src/gui/Raw.cpp"
 "src/core/SavefileManager.cpp"  
 "src/core/ContentRepository.cpp" 
- "src/core/base64.cpp")
 
-set(UIFILES "src/gui/MainWindow.ui")
-add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES}  "include/core/base64.h" "src/core/base64.cpp")
+"src/core/base64.cpp"
+"src/core/Node.cpp"
+"src/gui/TreeModel.cpp"
+)
+
+set(UIFILES "src/gui/MainWindow.ui" "src/gui/Raw.ui")
+add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES})
 
 target_include_directories(BitburnerEditor
     PUBLIC
     "include/"
-    $<$<CONFIG:DEBUG>:${CMAKE_CURRENT_BINARY_DIR}>
-    $<$<CONFIG:RELEASE>:${CMAKE_CURRENT_BINARY_DIR}>
+    $<$<CONFIG:DEBUG>:${CMAKE_CURRENT_BINARY_DIR}/BitburnerEditor_autogen/include>
+    $<$<CONFIG:RELEASE>:${CMAKE_CURRENT_BINARY_DIR}/BitburnerEditor_autogen/include>
 )
-
 
 target_link_libraries(BitburnerEditor Qt6::Widgets)
 
