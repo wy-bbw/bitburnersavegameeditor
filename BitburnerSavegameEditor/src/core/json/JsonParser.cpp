@@ -5,7 +5,7 @@
 #include <list>
 
 enum class State {
-	START, OBJ, KEY1, KEY, KEY_END, VAL_BEGIN, VALUE, END, ERROR, KEY_STR
+	START, OBJ, KEY1, KEY, KEY_END, VAL_BEGIN, VALUE, END, ERROR, KEY_STR, KEY_STR_ESC
 };
 
 constexpr char ESCAPE = '\\';
@@ -15,12 +15,11 @@ constexpr char CLOSE_BRACE = '}';
 constexpr char DOUBLE_COLON = ':';
 
 std::pair<State, Node*> handleStart(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
-	Node* nodeToReturn = currentNode;
-	State state = State::START;
 	if (c == OPEN_BRACE) {
-		Node* currentNode = new Node({ c });
+		Node* newNode = new Node({ c });
 		stack.push(currentNode);
-		state = State::OBJ;
+        buf.push_back(c);
+        return {State::OBJ, newNode};
 	}
 	else {
 		std::string errorString = "unexpected char '";
@@ -28,9 +27,9 @@ std::pair<State, Node*> handleStart(std::list<char>& buf, std::stack<Node*> stac
 		errorString += "'";
 		throw std::runtime_error(errorString);
 	}
-	return std::pair(state, nodeToReturn);
 };
 
+// TODO: check this
 std::pair<State, Node*> handleObj(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
 	Node* nodeToReturn = currentNode;
 	State state = State::OBJ;
@@ -54,61 +53,62 @@ std::pair<State, Node*> handleObj(std::list<char>& buf, std::stack<Node*> stack,
 			nodeToReturn = stack.top();
 			stack.pop();
 		}
-	}
-	else {
+	} else {
 		throw std::runtime_error("invalid char from obj.");
 	}
 	return std::pair(state, nodeToReturn);
 }
 
 std::pair<State, Node*> handleKey1(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
-	Node* nodeToReturn = currentNode;
-	State state = State::KEY1;
 	if (c == QUOTATION) {
 		buf.push_back(c);
-		state = State::KEY;
-	}
-	else {
+        return {State::KEY, currentNode};
+	} else {
 		throw std::runtime_error("unexpected char from Key1");
 	}
-	return std::pair(state, nodeToReturn);
 }
 
 std::pair<State, Node*> handleKey(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
-	Node* nodeToReturn = currentNode;
-	State state = State::KEY;
 	buf.push_back(c);
 	if (c == ESCAPE) {
-		state = State::KEY_END;
-	}
-	return std::pair(state, nodeToReturn);
+        return {State::KEY_END, currentNode};
+	} else {
+        return {State::KEY, currentNode};
+    }
 }
 
 std::pair<State, Node*> handleKeyEnd(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
-	Node* nodeToReturn = currentNode;
-	State state = State::KEY_END;
 	if (c == QUOTATION) {
 		buf.push_back(c);
-		state = State::VAL_BEGIN;
+        return {State::VAL_BEGIN, currentNode};
 	}
 	else {
 		throw std::runtime_error("handleKeyEnd failed");
 	}
-	return std::pair(state, nodeToReturn);
 }
 
 std::pair<State, Node*> handleValBegin(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
-	Node* nodeToReturn = currentNode;
-	State state = State::VAL_BEGIN;
 	if (c == DOUBLE_COLON) {
 		buf.push_back(c);
-		state = State::VALUE;
+        return std::pair(State::VALUE, currentNode);
 	}
 	else {
 		throw std::runtime_error("unexpected token in ValBegin");
 	}
-	return std::pair(state, nodeToReturn);
 }
+
+std::pair<State, Node *> handleKeyStr(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
+    Node* nodeToReturn = currentNode;
+    State state = State::KEY_STR;
+    buf.push_back(c);
+    if (c == ESCAPE) {
+        state = State::KEY_STR_ESC;
+    } else if (c == QUOTATION) {
+        state = State::VAL_BEGIN;
+    }
+    return std::pair(state, nodeToReturn);
+}
+
 
 //std::pair<State, Node*>
 
@@ -124,19 +124,25 @@ std::unique_ptr<Node> json::parseData(std::vector<std::byte> data) {
 		try {
 			if (state == State::START) {
 				std::tie(state, currentNode) = handleStart(buf, stack, c, currentNode);
-			}
-			else if (state == State::OBJ) {
+			} else if (state == State::OBJ) {
 				std::tie(state, currentNode) = handleObj(buf, stack, c, currentNode);
-			}
-			else if (state == State::KEY1) {
+			} else if (state == State::KEY1) {
 				std::tie(state, currentNode) = handleKey1(buf, stack, c, currentNode);
-			}
-			else if (state == State::KEY) {
+			} else if (state == State::KEY) {
 				std::tie(state, currentNode) = handleKey(buf, stack, c, currentNode);
-			}
-			else if (state == State::KEY_END) {
+			} else if (state == State::KEY_END) {
 				std::tie(state, currentNode) = handleKeyEnd(buf, stack, c, currentNode);
-			}
+			} else if (state  == State::KEY_STR) {
+                std::tie(state, currentNode) = handleKeyStr(buf, stack, c, currentNode);
+            } else if (state == State::KEY_STR_ESC) {
+                buf.push_back(c);
+                state = State::KEY_STR;
+            }  else if (state == State::VAL_BEGIN) {
+                std::tie(state, currentNode) = handleValBegin(buf, stack, c, currentNode);
+            }
+            else {
+                throw std::runtime_error("not implemented");
+            }
 		}
 		catch (std::exception& e) {
 			int distanceFromBegin = std::distance(data.begin(), it);

@@ -1,5 +1,6 @@
 #pragma once
 #include <QAbstractItemModel>
+#include <memory>
 #include <core/json/Node.h>
 
 class TreeModel : public QAbstractItemModel {

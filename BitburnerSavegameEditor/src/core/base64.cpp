@@ -1,8 +1,9 @@
 #include <core/base64.h>
+#include <cstdint>
 
 namespace base64 {
     // TODO: big thank you goes to Matheuses Gomes for instructions and code for base64 (de|en)coding https://github.com/matheusgomes28/base64pp/blob/main/base64pp/base64pp.cpp
-    std::array<std::uint8_t, 128> constexpr decode_table{ 0x64, 0x64, 0x64, 0x64,
+    std::array<uint8_t, 128> constexpr decode_table{ 0x64, 0x64, 0x64, 0x64,
         0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
         0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
         0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64, 0x64,
@@ -16,7 +17,7 @@ namespace base64 {
         0x64, 0x64, 0x64, 0x64 };
 
     std::array<std::byte, 3> decode_quad(std::array<char, 4> a) {
-        std::uint32_t const concat_bytes =
+        uint32_t const concat_bytes =
             (decode_table[a[0]] << 18) | (decode_table[a[1]] << 12)
             | (decode_table[a[2]] << 6) | decode_table[a[3]];
 

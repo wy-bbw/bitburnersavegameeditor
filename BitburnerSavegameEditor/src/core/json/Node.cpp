@@ -1,3 +1,4 @@
+#include <iostream>
 #include <core/json/Node.h>
 
 Node::Node(const std::vector<QVariant>& data, Node* parent) : itemData(data), parent(parent) {}
