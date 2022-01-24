@@ -5,9 +5,12 @@
 #include <QVariant>
 
 using Data = QVariant;
+class Node;
+void printPartialTree(std::ostream& os, Node* node, int indentationlevel = 0);
 
 
 class Node {
+	friend void printPartialTree(std::ostream& os, Node* node, int indentationlevel);
 public:
 	explicit Node(const std::vector<QVariant>& name, Node* parent = nullptr);
 	~Node();

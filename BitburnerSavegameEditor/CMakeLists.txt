@@ -30,7 +30,7 @@ set(SOURCEFILES
 set(UIFILES 
 "src/gui/MainWindow.ui" "src/gui/Raw.ui")
 
-add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES})
+add_executable (BitburnerEditor  ${SOURCEFILES} ${UIFILES} )
 
 target_include_directories(BitburnerEditor
     PUBLIC
@@ -39,5 +39,4 @@ target_include_directories(BitburnerEditor
 
 target_link_libraries(BitburnerEditor Qt6::Widgets)
 
-enable_testing()
 add_subdirectory("test/")

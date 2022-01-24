@@ -48,3 +48,13 @@ Node* Node::parentItem() {
 void Node::pushData(QVariant data) {
 	itemData.push_back(data);
 }
+
+void printPartialTree(std::ostream& os, Node* node, int indentationlevel) {
+	assert(node->itemData.size() > 0);
+	std::fill_n(std::ostream_iterator<char>(os), ' ', indentationlevel);
+	QString name = node->itemData.begin()->toString();
+	os << name.toStdString() << std::endl;
+	for (auto child : node->children) {
+		printPartialTree(os, child, indentationlevel + 1);
+	}
+}
