@@ -3,13 +3,14 @@ find_package(Qt6 REQUIRED COMPONENTS Test)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
-find_package(Boost 1.68 COMPONENTS unit_test_framework REQUIRED)
-
+find_package(Boost 1.68 COMPONENTS unit_test_framework )
+if (Boost_FOUND) 
 enable_testing(true)
 
 add_executable(JsonParserTest unit/core/json/JsonParserTest.cpp)
 target_link_libraries(JsonParserTest ${Boost_LIBRARIES})
 add_test(NAME JsonParserTest COMMAND JsonParserTest)
+ENDIF()
 
 #set(CMAKE_AUTOMOC ON)
 

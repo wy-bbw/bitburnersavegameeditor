@@ -97,6 +97,10 @@ std::pair<State, Node*> handleValBegin(std::list<char>& buf, std::stack<Node*> s
 	}
 }
 
+std::pair<State, Node*> handleVal(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
+
+}
+
 std::pair<State, Node *> handleKeyStr(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
     Node* nodeToReturn = currentNode;
     State state = State::KEY_STR;
@@ -137,10 +141,12 @@ std::unique_ptr<Node> json::parseData(std::vector<std::byte> data) {
             } else if (state == State::KEY_STR_ESC) {
                 buf.push_back(c);
                 state = State::KEY_STR;
-            }  else if (state == State::VAL_BEGIN) {
+            } else if (state == State::VAL_BEGIN) {
                 std::tie(state, currentNode) = handleValBegin(buf, stack, c, currentNode);
-            }
-            else {
+            } else if (state == State::VALUE) {
+				std::tie(state, currentNode) = handleVal(buf, stack, c, currentNode);
+
+			} else {
                 throw std::runtime_error("not implemented");
             }
 		}

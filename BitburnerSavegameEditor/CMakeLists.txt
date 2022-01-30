@@ -11,7 +11,7 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC OFF)
 
 ## change this for your system
-#list(APPEND CMAKE_PREFIX_PATH "C:/Qt/6.2.2/msvc2019_64")
+list(APPEND CMAKE_PREFIX_PATH "C:/Qt/6.2.2/msvc2019_64")
 
 find_package(Qt6 COMPONENTS Widgets REQUIRED)
 
