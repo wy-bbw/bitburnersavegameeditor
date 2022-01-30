@@ -7,5 +7,4 @@
 
 namespace json {
 	std::unique_ptr<Node> parseData(std::vector<std::byte> data);
-
 }

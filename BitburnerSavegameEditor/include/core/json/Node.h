@@ -20,6 +20,7 @@ public:
 	Node* parentItem();
 	Data data(unsigned int column) const;
 	void pushData(Data data);
+    void setPrimeData(Data data);
 	unsigned int childCount() const;
 	unsigned int columnCount() const;
 	unsigned int row() const;

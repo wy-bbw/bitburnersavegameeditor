@@ -1,7 +1,11 @@
 #include <iostream>
 #include <core/json/Node.h>
 
-Node::Node(const std::vector<QVariant>& data, Node* parent) : itemData(data), parent(parent) {}
+Node::Node(const std::vector<QVariant>& data, Node* parent) : itemData(data), parent(parent) {
+    if (parent != nullptr) {
+        parent->appendChild((this));
+    }
+}
 
 Node::~Node() {
 	for (auto p : children) delete p;
@@ -50,6 +54,10 @@ void Node::pushData(QVariant data) {
 	itemData.push_back(data);
 }
 
+void Node::setPrimeData(Data data) {
+    itemData[0] = data;
+}
+
 void printPartialTree(std::ostream& os, Node* node, int indentationlevel) {
 	assert(node->itemData.size() > 0);
 	std::fill_n(std::ostream_iterator<char>(os), ' ', indentationlevel);
@@ -59,3 +67,4 @@ void printPartialTree(std::ostream& os, Node* node, int indentationlevel) {
 		printPartialTree(os, child, indentationlevel + 1);
 	}
 }
+

@@ -1,0 +1,41 @@
+digraph g {
+    invis[label="", style = invis]
+    initial[label="start"shape=circle]
+    obj[label="obj",shape=circle]
+    key1[label="keyWEsc",shape=circle]
+    key[label="key",shape=circle]
+    keyescape[label="keyesc",shape=circle]
+    valuebeg[label="valuebegin", shape=circle]
+    value[label="value",shape=circle]
+    keyStr[label="keyStr",shape=circle]
+    keyStrSpecial[label="special",shape=circle]
+    valueStr[label="valuestr", shape=circle]
+    valueStrEnd[label="valueend",shape=circle]
+    valueSpc[label="special",shape=circle]
+    end[label="end",shape=doublecircle]
+
+    invis -> initial
+    initial -> obj [label="'{',push"]
+    obj -> key1[label="'\\'"]
+    obj -> end[label="'}',stack {}"]
+    obj -> keyStr[label="'\"'"]
+    obj -> obj[label="'}',pop,append"]
+
+    keyStr -> keyStrSpecial[label="'\\'"]
+    keyStrSpecial -> keyStr[label="\*"]
+    keyStr -> valuebeg[label="'\"'"]
+
+    key1 -> key[label="'\"'"]
+    key -> key[label="\*"]
+    key -> keyescape[label="'\\'"]
+    keyescape -> key[label="\*"]
+    key -> valuebeg[label="'\"'"]
+    valuebeg -> value[label="':'"]
+
+    value -> valueStr[label="'\"'"]
+    valueStr ->valueSpc[label="'\\'"]
+    valueSpc -> valueStr[label="\*"]
+    valueStr -> valueStrEnd[label="'\"'"]
+    valueStrEnd -> obj[label="',', append"]
+    value -> obj[label="'{',push"]
+}

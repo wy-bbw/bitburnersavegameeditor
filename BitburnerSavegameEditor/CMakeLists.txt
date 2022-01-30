@@ -44,4 +44,5 @@ target_include_directories(BitburnerEditor
 
 target_link_libraries(BitburnerEditor Qt6::Widgets)
 
+enable_testing(true)
 add_subdirectory("test/")

@@ -4,11 +4,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 
 find_package(Boost 1.68 COMPONENTS unit_test_framework )
-if (Boost_FOUND) 
+find_package(Qt6 COMPONENTS Widgets REQUIRED)
+if (Boost_FOUND)
 enable_testing(true)
-
-add_executable(JsonParserTest unit/core/json/JsonParserTest.cpp)
-target_link_libraries(JsonParserTest ${Boost_LIBRARIES})
+set(SOURCE ../src/core/json/Node.cpp ../src/core/json/JsonParser.cpp)
+add_executable(JsonParserTest unit/core/json/JsonParserTest.cpp ${SOURCE})
+target_link_libraries(JsonParserTest ${Boost_LIBRARIES} Qt6::Widgets)
+target_include_directories(JsonParserTest PUBLIC "../include")
 add_test(NAME JsonParserTest COMMAND JsonParserTest)
 ENDIF()
 

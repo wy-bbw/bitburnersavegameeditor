@@ -5,7 +5,7 @@
 #include <list>
 
 enum class State {
-	START, OBJ, KEY1, KEY, KEY_END, VAL_BEGIN, VALUE, END, ERROR, KEY_STR, KEY_STR_ESC
+	START, OBJ, KEY1, KEY, KEY_END, VAL_BEGIN, VALUE, END, ERROR, KEY_STR, KEY_STR_ESC, VALUE_STR, VALUE_SPC, VALUE_END
 };
 
 constexpr char ESCAPE = '\\';
@@ -13,10 +13,13 @@ constexpr char QUOTATION = '"';
 constexpr char OPEN_BRACE = '{';
 constexpr char CLOSE_BRACE = '}';
 constexpr char DOUBLE_COLON = ':';
+constexpr char COMMA = ',';
 
 std::pair<State, Node*> handleStart(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
 	if (c == OPEN_BRACE) {
-		Node* newNode = new Node({ c });
+        std::string toAdd = "";
+        toAdd += c;
+		Node* newNode = new Node({ QString::fromStdString(toAdd) });
 		stack.push(currentNode);
         buf.push_back(c);
         return {State::OBJ, newNode};
@@ -45,7 +48,10 @@ std::pair<State, Node*> handleObj(std::list<char>& buf, std::stack<Node*> stack,
 
 	}
 	else if (c == CLOSE_BRACE) {
-		if (stack.empty()) {
+        QString data = currentNode->data(0).toString();
+        data += c;
+        currentNode->setPrimeData(data);
+        if (stack.empty()) {
 			state = State::END;
 		}
 		else {
@@ -98,7 +104,51 @@ std::pair<State, Node*> handleValBegin(std::list<char>& buf, std::stack<Node*> s
 }
 
 std::pair<State, Node*> handleVal(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
+    if (c == QUOTATION) {
+        buf.push_back(c);
+        return std::pair(State::VALUE_STR, currentNode);
+    } else if (c == OPEN_BRACE) {
+        Node* child = new Node({""}, currentNode);
+        stack.push(currentNode);
+        std::string data;
+        std::copy(buf.begin(), buf.end(), std::back_inserter(data));
+        currentNode->setPrimeData(QString::fromStdString(data));
+        buf.clear();
+        return std::pair(State::OBJ, child);
+    } else {
+        throw std::runtime_error("handleVal: invalid token");
+    }
+}
 
+std::pair<State, Node*> handleValStr(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
+    buf.push_back(c);
+    if (c == QUOTATION) {
+        return std::pair(State::VALUE_END, currentNode);
+    } else if (c == ESCAPE) {
+        return std::pair(State::VALUE_SPC, currentNode);
+    } else {
+        throw std::runtime_error("handleValStr: unparsable token: " + c);
+    }
+}
+
+std::pair<State, Node*> handleValSpc(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
+    buf.push_back(c);
+    return std::pair(State::VALUE_STR, currentNode);
+}
+
+std::pair<State, Node*> handleValEnd(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
+    if (c == COMMA || c == CLOSE_BRACE) {
+        buf.push_back(c);
+        std::string data;
+        std::copy(buf.begin(), buf.end(), std::back_inserter(data));
+        Node* child = new Node({QString::fromStdString(data)}, currentNode);
+        if (c == CLOSE_BRACE) {
+            currentNode = stack.top();
+            stack.pop();
+        }
+        return std::pair(State::OBJ, currentNode);
+    }
+    throw std::runtime_error("handleValEnd() error: unparsable token");
 }
 
 std::pair<State, Node *> handleKeyStr(std::list<char>& buf, std::stack<Node*> stack, char c, Node* currentNode) {
@@ -112,7 +162,6 @@ std::pair<State, Node *> handleKeyStr(std::list<char>& buf, std::stack<Node*> st
     }
     return std::pair(state, nodeToReturn);
 }
-
 
 //std::pair<State, Node*>
 
@@ -144,8 +193,11 @@ std::unique_ptr<Node> json::parseData(std::vector<std::byte> data) {
             } else if (state == State::VAL_BEGIN) {
                 std::tie(state, currentNode) = handleValBegin(buf, stack, c, currentNode);
             } else if (state == State::VALUE) {
-				std::tie(state, currentNode) = handleVal(buf, stack, c, currentNode);
-
+                std::tie(state, currentNode) = handleVal(buf, stack, c, currentNode);
+            } else if (state == State::VALUE_STR) {
+                std::tie(state, currentNode) = handleValStr(buf, stack, c, currentNode);
+            } else if (state == State::VALUE_SPC) {
+                std::tie(state, currentNode) = handleValSpc(buf, stack, c, currentNode);
 			} else {
                 throw std::runtime_error("not implemented");
             }
@@ -173,9 +225,8 @@ std::unique_ptr<Node> json::parseData(std::vector<std::byte> data) {
 		}
 	}
 
-	printPartialTree(std::cout, currentNode, 1);
-	//assert(stack.empty());
-	//assert(state == State::END);
-	//assert(currentNode != nullptr);
+	assert(stack.empty());
+	assert(state == State::END);
+	assert(currentNode != nullptr);
 	return std::unique_ptr<Node>(currentNode);
 }
