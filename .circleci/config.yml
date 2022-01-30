@@ -15,11 +15,11 @@ jobs:
     steps:
       - checkout
       - run:
-        name: "setup environment"
-        command: "apt install build-essential"
+          name: "setup environment"
+          command: "apt install build-essential"
       - run:
-        name: "check compiler version"
-        command: "g++ --version"
+          name: "check compiler version"
+          command: "g++ --version"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
