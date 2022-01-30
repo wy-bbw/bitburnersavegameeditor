@@ -16,7 +16,7 @@ jobs:
       - checkout
       - run:
           name: "setup environment"
-          command: "apt install build-essential"
+          command: "sudo apt install build-essential"
       - run:
           name: "check compiler version"
           command: "g++ --version"
