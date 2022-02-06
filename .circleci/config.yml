@@ -18,8 +18,8 @@ jobs:
           name: "setup build tools"
           command: "sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test && sudo apt install -y g++-11"
       - run:
-          name: "add qt6"
-          command: "sudo apt install qt6-default"
+          name: "install aqt"
+          command: "pip install aqtinstall"
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
